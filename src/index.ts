@@ -1,5 +1,17 @@
 console.log('index.js: loaded');
 
+type GitHubUserInfo = {
+	name: string,
+	login: string,
+	avatar_url: string,
+	location: string,
+	public_repos: number,
+}
+
+function main() {
+	fetchUserInfo('poppen');
+}
+
 function fetchUserInfo(userId: string): string | void {
 	fetch(`https://api.github.com/users/${encodeURIComponent(userId)}`)
 		.then((response) => {
@@ -9,26 +21,33 @@ function fetchUserInfo(userId: string): string | void {
 			} else {
 				response.json().then((userInfo) => {
 					console.log(userInfo);
-					const view:string = escapeHTML `
-						<h4>${userInfo.name} (@${userInfo.login})</h4>
-						<img src="${userInfo.avatar_url}" alt="${userInfo.login}" height="100">
-						<di>
-							<dt>Location</dt>
-							<dd>${userInfo.location}</dd>
-							<dt>Repositories</dt>
-							<dd>${userInfo.public_repos}</dd>
-						</di>
-					`;
-
-					const result = document.getElementById('result');
-					if (result !== null) {
-						result.innerHTML = view;
-					}
+					const view = createView(userInfo);
+					displayView(view);
 				});
 			}
 		}).catch((error) => {
 			console.error(error);
 		});
+}
+
+function createView(userInfo: GitHubUserInfo): string {
+	return escapeHTML `
+		<h4>${userInfo.name} (@${userInfo.login})</h4>
+		<img src="${userInfo.avatar_url}" alt="${userInfo.login}" height="100">
+		<di>
+		<dt>Location</dt>
+		<dd>${userInfo.location}</dd>
+		<dt>Repositories</dt>
+		<dd>${String(userInfo.public_repos)}</dd>
+		</di>
+		`;
+}
+
+function displayView(view: string): void {
+	const result = document.getElementById('result');
+	if (result !== null) {
+		result.innerHTML = view;
+	}
 }
 
 function escapeSpecialChars(str: string): string {
