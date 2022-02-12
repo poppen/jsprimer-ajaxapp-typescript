@@ -10,12 +10,19 @@ type GitHubUserInfo = {
 
 function main() {
 	fetchUserInfo('poppen')
+		.then((userInfo: GitHubUserInfo) => {
+			console.log(userInfo);
+			return createView(userInfo);
+		})
+		.then((view: string) => {
+			displayView(view);
+		})
 		.catch((error: any) => {
 			console.error(`エラーが発生しました。（${error}）`);
 		});
 }
 
-function fetchUserInfo(userId: string): any | void {
+function fetchUserInfo(userId: string): Promise<GitHubUserInfo> | any | void {
 	return fetch(`https://api.github.com/users/${encodeURIComponent(userId)}`)
 		.then((response) => {
 			console.log(response.status);
@@ -23,11 +30,7 @@ function fetchUserInfo(userId: string): any | void {
 				console.error('エラーレスポンス', response);
 				return Promise.reject(new Error(`${response.status}: ${response.statusText}`));
 			} else {
-				return response.json().then((userInfo) => {
-					console.log(userInfo);
-					const view = createView(userInfo);
-					displayView(view);
-				});
+				return response.json();
 			}
 		});
 }
