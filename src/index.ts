@@ -8,18 +8,15 @@ type GitHubUserInfo = {
 	public_repos: number,
 }
 
-function main() {
-	fetchUserInfo('poppen')
-		.then((userInfo: GitHubUserInfo) => {
-			console.log(userInfo);
-			return createView(userInfo);
-		})
-		.then((view: string) => {
-			displayView(view);
-		})
-		.catch((error: any) => {
-			console.error(`エラーが発生しました。（${error}）`);
-		});
+async function main() {
+	try {
+		const userInfo: GitHubUserInfo = await fetchUserInfo('poppen');
+		console.log(userInfo);
+		const v = createView(userInfo);
+		displayView(v);
+	} catch (error) {
+		console.error(`エラーが発生しました。（${error}）`);
+	}
 }
 
 function fetchUserInfo(userId: string): Promise<GitHubUserInfo> | any | void {
