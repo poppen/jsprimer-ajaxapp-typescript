@@ -11,10 +11,6 @@ type GitHubUserInfo = {
 async function main() {
 	try {
 		const userId = getUserId();
-		if (userId.length === 0) {
-			displayError('GitHub User IDを入力してください。');
-			return;
-		}
 		const userInfo: GitHubUserInfo = await fetchUserInfo(userId);
 		console.log(userInfo);
 		const v = createView(userInfo);
@@ -42,7 +38,12 @@ function fetchUserInfo(userId: string): Promise<GitHubUserInfo> | any | void {
 
 function getUserId(): string {
 	const input = document.getElementById('userId') as HTMLInputElement;
-	return input.value;
+	const v = input.value;
+	if (v.length === 0) {
+		throw new Error('GitHub User IDを入力してください。');
+	} else {
+		return v;
+	}
 }
 
 function createView(userInfo: GitHubUserInfo): string {
