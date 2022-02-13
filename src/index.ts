@@ -10,7 +10,8 @@ type GitHubUserInfo = {
 
 async function main() {
 	try {
-		const userInfo: GitHubUserInfo = await fetchUserInfo('poppen');
+		const userId = getUserId();
+		const userInfo: GitHubUserInfo = await fetchUserInfo(userId);
 		console.log(userInfo);
 		const v = createView(userInfo);
 		displayView(v);
@@ -30,6 +31,16 @@ function fetchUserInfo(userId: string): Promise<GitHubUserInfo> | any | void {
 				return response.json();
 			}
 		});
+}
+
+function getUserId(): string {
+	const input = <HTMLInputElement>document.getElementById('userId');
+	const v = input.value;
+	if (v.length !== 0) {
+		return v;
+	} else {
+		throw new Error('GitHub User Idが入力されていません。');
+	}
 }
 
 function createView(userInfo: GitHubUserInfo): string {
