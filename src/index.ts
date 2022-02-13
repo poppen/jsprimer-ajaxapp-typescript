@@ -11,12 +11,19 @@ type GitHubUserInfo = {
 async function main() {
 	try {
 		const userId = getUserId();
+		if (userId.length === 0) {
+			displayError('GitHub User IDを入力してください。');
+			return;
+		}
 		const userInfo: GitHubUserInfo = await fetchUserInfo(userId);
 		console.log(userInfo);
 		const v = createView(userInfo);
 		displayView(v);
-	} catch (error) {
+	} catch (error: unknown) {
 		console.error(`エラーが発生しました。（${error}）`);
+		if (error instanceof Error) {
+			displayError(error.message);
+		}
 	}
 }
 
@@ -34,13 +41,8 @@ function fetchUserInfo(userId: string): Promise<GitHubUserInfo> | any | void {
 }
 
 function getUserId(): string {
-	const input = <HTMLInputElement>document.getElementById('userId');
-	const v = input.value;
-	if (v.length !== 0) {
-		return v;
-	} else {
-		throw new Error('GitHub User Idが入力されていません。');
-	}
+	const input = document.getElementById('userId') as HTMLInputElement;
+	return input.value;
 }
 
 function createView(userInfo: GitHubUserInfo): string {
@@ -57,9 +59,23 @@ function createView(userInfo: GitHubUserInfo): string {
 }
 
 function displayView(view: string): void {
+	clearError();
+
 	const result = document.getElementById('result');
 	if (result !== null) {
 		result.innerHTML = view;
+	}
+}
+
+function clearError(): void {
+	displayError('');
+}
+
+
+function displayError(msg: string): void {
+	const result = document.getElementById('error');
+	if (result !== null) {
+		result.textContent = msg;
 	}
 }
 
